@@ -1,0 +1,37 @@
+name: OSYM Duyuru Kaziyici
+
+on:
+  schedule:
+    - cron: '*/60 * * * *' # Her 60 dakikada bir çalıştır
+  workflow_dispatch: # Github üzerinden manuel tetiklemeye izin ver
+
+jobs:
+  scrape-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repoyu Çek (Checkout)
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Kütüphaneleri Yükle
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Kazıyıcıyı Çalıştır
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scraper.py
+
+      - name: Değişiklikleri Kaydet ve Pushla
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add osym_duyurular.json
+          # Eğer dosyada değişiklik yoksa hata vermemesi için || true kullanıyoruz
+          git commit -m "Otomatik güncelleme: OSYM duyuruları" || true
+          git push

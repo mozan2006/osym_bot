@@ -2,7 +2,7 @@ name: OSYM Duyuru Kaziyici
 
 on:
   schedule:
-    - cron: '*/60 * * * *' # Her 60 dakikada bir çalıştır
+    - cron: '0 */2 * * *' # Her 2 saatte bir çalıştır
   workflow_dispatch: # Github üzerinden manuel tetiklemeye izin ver
 
 jobs:
